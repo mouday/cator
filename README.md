@@ -1,10 +1,14 @@
 # Cator
 
 ## 简介
-封装了mysql和sqlite，用于零时执行一些脚本，如果项目中使用
+封装了mysql和sqlite，用于零时执行一些脚本，项目中使用
 
+支持4种占位符：
 
-
+```
+mysql风格： %s   %(key)s
+sqlite风格：?    :key 
+```
 
 ## 安装
 ```bash
