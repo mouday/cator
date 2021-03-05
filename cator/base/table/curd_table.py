@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Union
+from typing import Union, Dict
 
 from cator.base.database.database import Database
 from cator.sql.sql_builder import SqlBuilder
@@ -14,7 +14,7 @@ class CurdTable(object):
         self.primary_key = primary_key
 
     @property
-    def total(self):
+    def total(self) -> int:
         sql = (SqlBuilder()
                .select('count(*) as total')
                .from_(self.backquote_table_name)
@@ -23,7 +23,7 @@ class CurdTable(object):
         row = self.database.select_one(operation=sql)
         return row['total']
 
-    def insert(self, data: Union[dict, list]):
+    def insert(self, data: Union[dict, list]) -> int:
         """
         :param data: list[dict]/dict
         :return: affect row count
@@ -46,7 +46,7 @@ class CurdTable(object):
 
         return self.database.insert(operation=sql, params=data)
 
-    def insert_one(self, data: dict):
+    def insert_one(self, data: dict) -> int:
         """
         :param data: dict
         :return: inserted row id
@@ -59,7 +59,7 @@ class CurdTable(object):
 
         return self.database.insert_one(operation=sql, params=data)
 
-    def delete_by_id(self, uid):
+    def delete_by_id(self, uid) -> int:
         """
         :param uid: primary key value
         :return: affect row count
@@ -73,7 +73,7 @@ class CurdTable(object):
 
         return self.database.delete(operation=sql, params=params)
 
-    def update_by_id(self, uid, data):
+    def update_by_id(self, uid, data) -> int:
         """
         :param uid: primary key value
         :param data: dict
@@ -90,7 +90,7 @@ class CurdTable(object):
 
         return self.database.update(operation=sql, params=params)
 
-    def select_by_id(self, uid):
+    def select_by_id(self, uid) -> Dict:
         """
         :param uid: primary key value
         :return: row dict
