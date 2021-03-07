@@ -1,5 +1,11 @@
 # Cator
 
+![PyPI](https://img.shields.io/pypi/v/cator.svg)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/cator)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cator)
+![PyPI - License](https://img.shields.io/pypi/l/cator)
+
+
 ## 简介
 封装了mysql和sqlite，用于零时执行一些脚本，项目中使用
 

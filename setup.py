@@ -8,14 +8,15 @@ import os
 from setuptools import setup, find_packages
 
 """
-## 本地测试
-安装测试
-python setup.py install
+## 本地安装/卸载
 
+python setup.py install
+pip uninstall cator -y
+
+## 测试安装/卸载
+python setup.py develop
 python setup.py develop -u
  
-卸载
-pip uninstall myquery -y
 ## 打包上传
 先升级打包工具
 pip install --upgrade setuptools wheel twine
@@ -31,9 +32,11 @@ rm -rf dist build *.egg-info \
 && twine check dist/* \
 && twine upload dist/* \
 && rm -rf dist build *.egg-info
+
 ## 下载测试
 安装测试
-pip install -U cator -i https://pypi.org/simple
+pip install -U cator -i https://pypi.org/project
+
 打包的用的setup必须引入
 参考：
 https://packaging.python.org/guides/making-a-pypi-friendly-readme/
