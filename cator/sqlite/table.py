@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cator.base import Table
+from ..base import Table
 
 
 class SqliteTable(Table):
@@ -10,5 +10,5 @@ class SqliteTable(Table):
         # equal
         sql = 'SELECT * FROM PRAGMA_TABLE_INFO(:table_name)'
         params = {'table_name': self.table_name}
-        rows = self.database.select(operation=sql, params=params)
+        rows = self.database.select(sql=sql, params=params)
         return [row['name'] for row in rows]

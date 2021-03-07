@@ -5,13 +5,15 @@ import glob
 import io
 import os
 
-import six
 from setuptools import setup, find_packages
 
 """
 ## 本地测试
 安装测试
-python setup.py install 
+python setup.py install
+
+python setup.py develop -u
+ 
 卸载
 pip uninstall myquery -y
 ## 打包上传
@@ -44,7 +46,7 @@ version_file = glob.glob("*/version.py", recursive=True)[0]
 
 with io.open(version_file, 'rb') as f:
     version_var = {}
-    six.exec_(f.read(), version_var)
+    exec(f.read(), version_var)
     VERSION = version_var['VERSION']
 
 # 说明

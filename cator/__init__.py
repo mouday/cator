@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from cator.base.database.database import Database
-from cator.db_url import parse_url_to_dict
-from cator.mysql.database import MysqlDatabase
-from cator.sqlite.database import SqliteDatabase
+from .base import Database
+from .db_url import parse_url_to_dict
+from .mysql import MysqlDatabase
+from .sqlite import SqliteDatabase
 
 schemes = {
     'mysql': MysqlDatabase,

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 
-from cator import Database
-from cator.sql import SqlUtil
+from ..base import Database
+from ..sql import SqlUtil
 from .table import SqliteTable
 
 
@@ -26,13 +26,19 @@ class SqliteDatabase(Database):
         super().__init__(**kwargs)
         self.autocommit = autocommit
 
-        self.connection = sqlite3.connect(**kwargs)
-        self.connection.row_factory = dict_factory
-        self.cursor = self.connection.cursor()
+    def cursor(self, *args, **kwargs):
+        if self.connection is None:
+            self.connect()
 
-    def before_execute(self, operation, params=None):
-        sql = SqlUtil.prepare_sqlite_sql(operation)
-        return super().before_execute(sql, params)
+        return self.connection.cursor()
+
+    def connect(self):
+        self.connection = sqlite3.connect(**self.config)
+        self.connection.row_factory = dict_factory
+
+    def before_execute(self, sql, params=None):
+        _sql = SqlUtil.prepare_sqlite_sql(sql)
+        return super().before_execute(_sql, params)
 
     def after_execute(self, cursor):
         """自动提交"""
@@ -43,7 +49,7 @@ class SqliteDatabase(Database):
     @property
     def tables(self):
         sql = 'SELECT `name` FROM SQLITE_MASTER WHERE type="table"'
-        rows = self.select(operation=sql)
+        rows = self.select(sql=sql)
         return [row['name'] for row in rows]
 
     def table(self, table_name):

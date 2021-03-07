@@ -1,26 +1,32 @@
 # -*- coding: utf-8 -*-
-from typing import Union, Dict
 
-from cator.base.database.database import Database
-from cator.sql.sql_builder import SqlBuilder
-from cator.sql.sql_util import SqlUtil
+from typing import Union, Dict, List
+
+from cator.sql import SqlBuilder
+from ..sql import SqlUtil
 
 
-class CurdTable(object):
+class Table(object):
 
-    def __init__(self, database: Database, table_name: str, primary_key: str = 'id'):
+    def __init__(self, database, table_name: str, primary_key: str = 'id'):
         self.database = database
         self.table_name = table_name
         self.primary_key = primary_key
 
     @property
+    def columns(self) -> List:
+        """返回列名"""
+        raise NotImplementedError
+
+    @property
     def total(self) -> int:
+        """返回表数据行数"""
         sql = (SqlBuilder()
                .select('count(*) as total')
                .from_(self.backquote_table_name)
                .build()
                )
-        row = self.database.select_one(operation=sql)
+        row = self.database.select_one(sql=sql)
         return row['total']
 
     def insert(self, data: Union[dict, list]) -> int:
@@ -44,7 +50,7 @@ class CurdTable(object):
                .build()
                )
 
-        return self.database.insert(operation=sql, params=data)
+        return self.database.insert(sql=sql, params=data)
 
     def insert_one(self, data: dict) -> int:
         """
@@ -57,7 +63,7 @@ class CurdTable(object):
                .build()
                )
 
-        return self.database.insert_one(operation=sql, params=data)
+        return self.database.insert_one(sql=sql, params=data)
 
     def delete_by_id(self, uid) -> int:
         """
@@ -71,7 +77,7 @@ class CurdTable(object):
                )
         params = {self.primary_key: uid}
 
-        return self.database.delete(operation=sql, params=params)
+        return self.database.delete(sql=sql, params=params)
 
     def update_by_id(self, uid, data) -> int:
         """
@@ -88,7 +94,7 @@ class CurdTable(object):
 
         params = {**data, self.primary_key: uid}
 
-        return self.database.update(operation=sql, params=params)
+        return self.database.update(sql=sql, params=params)
 
     def select_by_id(self, uid) -> Dict:
         """
@@ -104,7 +110,7 @@ class CurdTable(object):
 
         params = {self.primary_key: uid}
 
-        return self.database.select_one(operation=sql, params=params)
+        return self.database.select_one(sql=sql, params=params)
 
     @property
     def primary_key_equal_sql(self):

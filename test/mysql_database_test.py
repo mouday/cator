@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-import time
+import logging
 import unittest
 
 import cator
-import logging
 
 logging.basicConfig(level=logging.DEBUG)
-
-import playhouse.db_url
 
 
 class MySqlDatabaseTest(unittest.TestCase):
@@ -41,7 +38,7 @@ class MySqlDatabaseTest(unittest.TestCase):
     def test_table_insert_one(self):
         ret = self.table.insert_one({'name': 'Tom', 'age': 23})
         print('ret', ret)
-        time.sleep(20)
+        # time.sleep(20)
 
     def test_table_insert(self):
         ret = self.table.insert(
