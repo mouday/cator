@@ -135,6 +135,60 @@ class Table:
 
 ```
 
+## 扩展peewee
+
+通过`DictMySQLDatabase`类，使得peewee原生sql查询进行增强
+
+```python
+
+from peewee import MySQLDatabase
+from cator.peewee import DictMySQLDatabase
+
+config = {
+    'host': 'localhost',
+    'port': 3306,
+    'user': 'root',
+    'password': '123456',
+    'database': 'data',
+    'charset': 'utf8mb4',
+}
+
+# db = MySQLDatabase(**config)
+db = DictMySQLDatabase(**config)
+
+```
+
+增强的方法
+
+```python
+from peewee import MySQLDatabase
+
+
+class DictMySQLDatabase(MySQLDatabase):
+    def table(self, table_name):
+        pass
+    
+    def select(self, operation, params=()):
+        pass
+
+    def select_one(self, operation, params=()):
+        pass
+
+    def update(self, operation, params=()):
+        pass
+
+    def delete(self, operation, params=()):
+        pass
+
+    def insert(self, operation, params: Union[list, dict]):
+        pass
+
+    def insert_one(self, operation, params: Union[tuple, dict] = ()):
+        pass
+
+    def query(self, sql, params=None):
+        pass
+```
 
 ## 注意问题
 
