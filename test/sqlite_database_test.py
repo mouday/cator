@@ -38,17 +38,11 @@ class SQLiteDatabaseTest(unittest.TestCase):
 
     def test_transaction(self):
         self.db.table('person').insert_one({'name': 'transaction-rollback'})
-        print('in_transaction', self.db.in_transaction)
         self.db.rollback()
-
-        print('in_transaction', self.db.in_transaction)
-
         self.db.table('person').insert_one({'name': 'transaction-commit'})
-        print('in_transaction', self.db.in_transaction)
         self.db.commit()
 
     def test_table_insert_one(self):
-        print('in_transaction', self.db.in_transaction)
         ret = self.table.insert_one({'name': 'Tom', 'age': 23})
         print('ret', ret)
 

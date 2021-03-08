@@ -29,6 +29,13 @@ def parse_query(query):
 
 
 def parse_url_to_dict(db_url):
+    """
+    connection constructor parameters:
+    optional: user, password, host, port
+
+    see: https://www.python.org/dev/peps/pep-0249/#footnotes
+    :return:
+    """
     parsed = urlparse(db_url)
 
     connect_kwargs = {
@@ -37,7 +44,7 @@ def parse_url_to_dict(db_url):
     }
 
     if parsed.username:
-        connect_kwargs['username'] = parsed.username
+        connect_kwargs['user'] = parsed.username
     if parsed.password:
         connect_kwargs['password'] = parsed.password
     if parsed.hostname:

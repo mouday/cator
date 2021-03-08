@@ -9,16 +9,20 @@
 - Pypi: [https://pypi.org/project/cator](https://pypi.org/project/cator)
 
 ## 简介
-封装了mysql和sqlite，用于零时执行一些脚本，项目中使用
+支持 mysql和sqlite数据库
 
-返回数据以dict字典为主，若要修改返回值类型，可以通过继承修改
+返回数据统一为dict 字典
 
-支持4种占位符：
+无论使用什么数据库驱动都支持4种占位符：
 
-```
-mysql风格： %s   %(key)s
-sqlite风格：?    :key 
-```
+| paramstyle | support | Meaning | example|
+| - | - | - | - |
+| qmark | OK | Question mark style | ...WHERE name=? |
+| numeric   | - | Numeric, positional style | ...WHERE name=:1 |
+| named | OK | Named style | ...WHERE name=:name |
+| format    | OK | ANSI C printf format codes | ...WHERE name=%s |
+| pyformat | OK | Python extended format codes | ...WHERE name=%(name)s |
+
 
 ## 安装
 ```bash
@@ -100,9 +104,6 @@ class Database:
     def rollback(self):
         pass
 
-    @property
-    def in_transaction(self):
-        pass
 ```
 
 Table 类
@@ -135,7 +136,7 @@ class Table:
 
 ```
 
-## 扩展peewee
+## 扩展 peewee
 
 通过`DictMySQLDatabase`类，使得peewee原生sql查询进行增强
 
@@ -153,6 +154,7 @@ config = {
     'charset': 'utf8mb4',
 }
 
+# replace MySQLDatabase to DictMySQLDatabase
 # db = MySQLDatabase(**config)
 db = DictMySQLDatabase(**config)
 
@@ -197,7 +199,7 @@ class DictMySQLDatabase(MySQLDatabase):
 3. 如果需要执行事务就需要关闭自动提交
 
 
-cator基于以下模块进行改进
+cator基于以下模块进行了改进
 
 1. myquery
 2. aquery

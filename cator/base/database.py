@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from typing import List, Union, Dict
 
+from cator.base.dbapi import Connection
+from cator.common import dict_factory
 from cator.logger import logger
 from .table import Table
 
 
-class Database(object):
-    def __init__(self, **kwargs):
-        self._connection = None
+class Database(Connection):
+    def __init__(self, connection: Connection = None, **kwargs):
+        self._connection = connection
         self.config = kwargs
 
     ############################################
@@ -20,13 +22,16 @@ class Database(object):
 
         return self._connection
 
-    def cursor(self):
-        """返回cursor 对象"""
-        raise NotImplementedError()
-
     def connect(self):
         """连接数据库"""
         raise NotImplementedError()
+
+    ############################################
+    # DB API V2.0
+    ############################################
+    def cursor(self):
+        """返回cursor 对象"""
+        return self.connection.cursor()
 
     def close(self):
         """关闭连接"""
@@ -36,18 +41,11 @@ class Database(object):
         self._connection = None
         logger.debug("Database close")
 
-    ############################################
-    # transaction
-    ############################################
     def commit(self):
         return self._connection.commit()
 
     def rollback(self):
         return self._connection.rollback()
-
-    @property
-    def in_transaction(self):
-        return self._connection.in_transaction
 
     ############################################
     # table
@@ -79,21 +77,26 @@ class Database(object):
         """
         执行sql 语句
         :param sql:
-        :param params: dict/tuple、list[dict]/list[tuple]
+        :param params:
+                 params type        | call method
+            -----------------------------------------
+            dict/tuple/None         | execute
+            list[dict]/list[tuple]  | executemany
+            -----------------------------------------
         :return:
         """
 
-        _sql = self.before_execute(sql=sql, params=params)
+        sql = self.before_execute(sql=sql, params=params)
 
         cursor = self.cursor()
 
         # mysql 和 sqlite3 关键字参数不一样,只能使用位置参数
         if isinstance(params, list):
-            cursor.executemany(_sql, params)
+            cursor.executemany(sql, params)
         elif params:
-            cursor.execute(_sql, params)
+            cursor.execute(sql, params)
         else:
-            cursor.execute(_sql)
+            cursor.execute(sql)
 
         return self.after_execute(cursor)
 
@@ -101,32 +104,32 @@ class Database(object):
     # curd
     ############################################
 
-    def select(self, sql: str, params=()) -> List:
-        """查询多行数据"""
+    def select(self, sql: str, params=None) -> List:
+        """select rows and return rows as list"""
         cursor = self.execute(sql=sql, params=params)
-        return cursor.fetchall()
+        return [dict_factory(cursor, row) for row in cursor.fetchall()]
 
-    def select_one(self, sql: str, params=()) -> Dict:
-        """查询一行数据"""
+    def select_one(self, sql: str, params=None) -> Dict:
+        """select rows and return one row as dict"""
         cursor = self.execute(sql=sql, params=params)
-        return cursor.fetchone()
+        return dict_factory(cursor, cursor.fetchone())
 
-    def update(self, sql: str, params=()) -> int:
-        """更新数据"""
-        cursor = self.execute(sql=sql, params=params)
-        return cursor.rowcount
-
-    def delete(self, sql: str, params=()) -> int:
-        """删除数据"""
+    def update(self, sql: str, params=None) -> int:
+        """update rows and return rowcount"""
         cursor = self.execute(sql=sql, params=params)
         return cursor.rowcount
 
-    def insert(self, sql: str, params: Union[list, dict]) -> int:
-        """插入一行或多行数据"""
+    def delete(self, sql: str, params=None) -> int:
+        """delete rows and return rowcount"""
         cursor = self.execute(sql=sql, params=params)
         return cursor.rowcount
 
-    def insert_one(self, sql: str, params: Union[tuple, dict] = ()) -> int:
-        """插入一行数据"""
+    def insert(self, sql: str, params: Union[list, dict] = None) -> int:
+        """insert one or many row and return rowcount"""
+        cursor = self.execute(sql=sql, params=params)
+        return cursor.rowcount
+
+    def insert_one(self, sql: str, params: Union[tuple, dict] = None) -> int:
+        """insert one row and return lastrowid"""
         cursor = self.execute(sql=sql, params=params)
         return cursor.lastrowid
