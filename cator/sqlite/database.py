@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 
+from cator.common import dict_factory
+
 from ..base import Database
 from ..sql import SqlUtil
 from .table import SqliteTable
@@ -12,17 +14,6 @@ class IsolationLevel(Enum):
     DEFERRED = 'DEFERRED'  # default
     IMMEDIATE = 'IMMEDIATE'
     EXCLUSIVE = 'EXCLUSIVE'
-
-
-def dict_factory(cursor, row):
-    """
-    查询结果转为dict
-    see: https://docs.python.org/zh-cn/3.7/library/sqlite3.html#sqlite3.Connection.row_factory
-    """
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
 
 
 class SqliteDatabase(Database):

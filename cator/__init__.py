@@ -4,9 +4,10 @@ from .db_url import parse_url_to_dict
 from .mysql import MysqlDatabase
 from .sqlite import SqliteDatabase
 
+
 schemes = {
     'mysql': MysqlDatabase,
-    'sqlite': SqliteDatabase
+    'sqlite': SqliteDatabase,
 }
 
 
