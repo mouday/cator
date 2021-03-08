@@ -7,8 +7,51 @@ from .table import Table
 
 class Database(object):
     def __init__(self, **kwargs):
-        self.connection = None
+        self._connection = None
         self.config = kwargs
+
+    ############################################
+    # connection
+    ############################################
+    @property
+    def connection(self):
+        if self._connection is None:
+            self.connect()
+
+        return self._connection
+
+    def cursor(self):
+        """返回cursor 对象"""
+        raise NotImplementedError()
+
+    def connect(self):
+        """连接数据库"""
+        raise NotImplementedError()
+
+    def close(self):
+        """关闭连接"""
+        if hasattr(self._connection, 'close'):
+            self._connection.close()
+
+        self._connection = None
+        logger.debug("Database close")
+
+    ############################################
+    # transaction
+    ############################################
+    def commit(self):
+        return self._connection.commit()
+
+    def rollback(self):
+        return self._connection.rollback()
+
+    @property
+    def in_transaction(self):
+        return self._connection.in_transaction
+
+    ############################################
+    # table
+    ############################################
 
     @property
     def tables(self) -> List:
@@ -19,20 +62,9 @@ class Database(object):
         """获取表操作对象"""
         raise NotImplementedError
 
-    def cursor(self, *args, **kwargs):
-        """返回cursor 对象"""
-        raise NotImplementedError()
-
-    def connect(self):
-        """连接数据库"""
-        raise NotImplementedError()
-
-    def close(self):
-        """关闭游标和连接"""
-        if hasattr(self.connection, 'close'):
-            self.connection.close()
-
-        logger.debug("Database close")
+    ############################################
+    # execute
+    ############################################
 
     def before_execute(self, sql: str, params=None):
         """执行前"""
@@ -64,6 +96,10 @@ class Database(object):
             cursor.execute(_sql)
 
         return self.after_execute(cursor)
+
+    ############################################
+    # curd
+    ############################################
 
     def select(self, sql: str, params=()) -> List:
         """查询多行数据"""

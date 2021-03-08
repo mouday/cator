@@ -5,6 +5,8 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cator)
 ![PyPI - License](https://img.shields.io/pypi/l/cator)
 
+- Github: [https://github.com/mouday/cator](https://github.com/mouday/cator)
+- Pypi: [https://pypi.org/project/cator](https://pypi.org/project/cator)
 
 ## 简介
 封装了mysql和sqlite，用于零时执行一些脚本，项目中使用
@@ -25,6 +27,8 @@ pip install cator
 
 ## 使用示例
 
+指定 autocommit 模式
+
 ```python
 import cator
 
@@ -32,7 +36,7 @@ import cator
 db_url = "mysql://root:123456@127.0.0.1:3306/data?charset=utf8&autocommit=true"
 
 # sqlite
-db_url = 'sqlite:///data.db?autocommit=true'
+db_url = 'sqlite:///data.db?isolation_level=null'
 
 # open Database
 db = cator.connect(db_url)
@@ -80,6 +84,15 @@ class Database:
 
     def execute(self, operation, params=None):
         pass
+    
+    def cursor(self, *args, **kwargs):
+        """返回cursor 对象"""
+
+    def connect(self):
+        """连接数据库"""
+
+    def close(self):
+        """关闭连接"""
 
 ```
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from mysql.connector import Connect
-
 from cator.logger import logger
 from ..base import Database
 from ..sql import SqlUtil
@@ -12,20 +11,30 @@ class MysqlDatabase(Database):
     doc: https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
     """
 
-    def cursor(self, buffered=None, raw=None,
-               prepared=None, cursor_class=None,
-               dictionary=True, named_tuple=None):
-        if self.connection is None:
-            self.connect()
+    def cursor(self):
+        return self.connection.cursor(dictionary=True)
 
-        return self.connection.cursor(
-            buffered=buffered, raw=raw,
-            prepared=prepared, cursor_class=cursor_class,
-            dictionary=dictionary, named_tuple=named_tuple)
+    def start_transaction(self):
+        return self._connection.start_transaction()
+
+    @property
+    def autocommit(self):
+        return self._connection.autocommit
+
+    @autocommit.setter
+    def autocommit(self, value: bool):
+        self._connection.autocommit = value
 
     def connect(self):
-        self.connection = Connect(**self.config)
+        self._connection = Connect(**self.config)
         logger.debug("Database open")
+
+    def start_transaction(self, consistent_snapshot=False,
+                          isolation_level=None, readonly=None):
+        self._connection.start_transaction(
+            consistent_snapshot=consistent_snapshot,
+            isolation_level=isolation_level,
+            readonly=readonly)
 
     def before_execute(self, sql, params=None):
         sql = SqlUtil.prepare_mysql_sql(sql)

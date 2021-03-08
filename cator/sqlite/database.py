@@ -4,6 +4,14 @@ import sqlite3
 from ..base import Database
 from ..sql import SqlUtil
 from .table import SqliteTable
+from enum import Enum
+
+
+# doc： https://www.sqlite.org/lang_transaction.html#immediate
+class IsolationLevel(Enum):
+    DEFERRED = 'DEFERRED'  # default
+    IMMEDIATE = 'IMMEDIATE'
+    EXCLUSIVE = 'EXCLUSIVE'
 
 
 def dict_factory(cursor, row):
@@ -19,32 +27,28 @@ def dict_factory(cursor, row):
 
 class SqliteDatabase(Database):
     """
+    autocommit: 指定参数 isolation_level=null
     doc: https://docs.python.org/zh-cn/3.7/library/sqlite3.html
     """
 
-    def __init__(self, autocommit=False, **kwargs):
-        super().__init__(**kwargs)
-        self.autocommit = autocommit
-
-    def cursor(self, *args, **kwargs):
-        if self.connection is None:
-            self.connect()
-
+    def cursor(self):
         return self.connection.cursor()
 
+    @property
+    def isolation_level(self):
+        return self._connection.isolation_level
+
+    @isolation_level.setter
+    def isolation_level(self, value: bool):
+        self._connection.isolation_level = value
+
     def connect(self):
-        self.connection = sqlite3.connect(**self.config)
-        self.connection.row_factory = dict_factory
+        self._connection = sqlite3.connect(**self.config)
+        self._connection.row_factory = dict_factory
 
     def before_execute(self, sql, params=None):
         _sql = SqlUtil.prepare_sqlite_sql(sql)
         return super().before_execute(_sql, params)
-
-    def after_execute(self, cursor):
-        """自动提交"""
-        if self.autocommit:
-            self.connection.commit()
-        return cursor
 
     @property
     def tables(self):
