@@ -28,7 +28,7 @@ def parse_query(query):
     return query_dict
 
 
-def parse_url_to_dict(db_url):
+def parse_url_to_dict(db_uri):
     """
     connection constructor parameters:
     optional: user, password, host, port
@@ -36,7 +36,7 @@ def parse_url_to_dict(db_url):
     see: https://www.python.org/dev/peps/pep-0249/#footnotes
     :return:
     """
-    parsed = urlparse(db_url)
+    parsed = urlparse(db_uri)
 
     connect_kwargs = {
         'database': parsed.path[1:],

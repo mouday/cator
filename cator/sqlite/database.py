@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
-from sqlite3 import connect
 
 from cator.base import DatabaseProxy
 from cator.base.dbapi import Connection
 from cator.logger import logger
+
+try:
+    from sqlite3 import connect
+except ImportError:
+    from cator.common import connect
 
 
 # doc： https://www.sqlite.org/lang_transaction.html#immediate

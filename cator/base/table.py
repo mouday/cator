@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Union, Dict, List
+from typing import Union, Dict
 
 from cator.sql import SqlBuilder, SqlUtil
 

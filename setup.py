@@ -65,7 +65,7 @@ setup(
     version=VERSION,
     description="a quick tool base dict for mysql and sqlite",
 
-    keywords='cator,mysql,sqlite,dict',
+    keywords='cator,mysql,pymysql,sqlite,dict,peewee',
     author='Peng Shiyu',
     author_email='pengshiyuyx@gmail.com',
     license='MIT',

@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
-# peewee use pymysql
 from cator.base import DatabaseProxy
+from cator.logger import logger
 
 try:
-    # pymysql
-    from pymysql import connect, paramstyle
+    from pymysql import connect
 except ImportError:
     # mysql-connector-python
-    from mysql.connector import connect, paramstyle
-
-
-from cator.logger import logger
+    try:
+        from mysql.connector import connect
+    except ImportError:
+        from cator.common import connect
 
 
 class MysqlDatabaseProxy(DatabaseProxy):
