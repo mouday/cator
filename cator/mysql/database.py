@@ -14,9 +14,6 @@ class MysqlDatabase(Database):
     def cursor(self):
         return self.connection.cursor(dictionary=True)
 
-    def start_transaction(self):
-        return self._connection.start_transaction()
-
     @property
     def autocommit(self):
         return self._connection.autocommit

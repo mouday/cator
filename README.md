@@ -93,7 +93,16 @@ class Database:
 
     def close(self):
         """关闭连接"""
+        
+    def commit(self):
+        pass
 
+    def rollback(self):
+        pass
+
+    @property
+    def in_transaction(self):
+        pass
 ```
 
 Table 类
