@@ -50,5 +50,5 @@ class DictMySQLDatabase(MySQLDatabase):
         cursor = self.query(sql=sql, params=params)
         return cursor.lastrowid
 
-    def table(self, table_name):
+    def table(self, table_name: str) -> MysqlTable:
         return MysqlTable(self, table_name)

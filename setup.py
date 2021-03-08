@@ -35,7 +35,7 @@ rm -rf dist build *.egg-info \
 
 ## 下载测试
 安装测试
-pip install -U cator -i https://pypi.org/project
+pip3 install -U cator -i https://pypi.org/project
 
 打包的用的setup必须引入
 参考：
