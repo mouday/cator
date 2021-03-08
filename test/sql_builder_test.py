@@ -21,20 +21,14 @@ class SqlBuilderTest(unittest.TestCase):
         self.assertEqual(sql, ret)
 
     def test_2(self):
-        in_sql, data = SqlUtil.column_in(column='age', list_params=['1', '2', '3'])
-
-        print(data)
-
         sql = (SqlBuilder()
                .select_from('table')
                .where(SqlUtil.column_operation_sql('name'))
                .and_(SqlUtil.column_operation_sql('age', operator='>'))
-               .and_('age')
-               .in_(in_sql)
                .build()
                )
-
-        ret = 'SELECT FROM table WHERE `name` = %(name)s AND `age` > %(age)s AND age IN ( %(age-0)s, %(age-1)s, %(age-2)s )'
+        print(sql)
+        ret = 'SELECT FROM table WHERE `name` = %(name)s AND `age` > %(age)s'
 
         self.assertEqual(sql, ret)
 

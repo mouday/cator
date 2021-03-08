@@ -2,8 +2,7 @@
 
 from typing import Union, Dict, List
 
-from cator.sql import SqlBuilder
-from ..sql import SqlUtil
+from cator.sql import SqlBuilder, SqlUtil
 
 
 class Table(object):
@@ -14,18 +13,14 @@ class Table(object):
         self.primary_key = primary_key
 
     @property
-    def columns(self) -> List:
-        """返回列名"""
-        raise NotImplementedError
-
-    @property
     def total(self) -> int:
-        """返回表数据行数"""
+        """return table row total count"""
         sql = (SqlBuilder()
                .select('count(*) as total')
                .from_(self.backquote_table_name)
                .build()
                )
+
         row = self.database.select_one(sql=sql)
         return row['total']
 
@@ -75,6 +70,7 @@ class Table(object):
                .where(self.primary_key_equal_sql)
                .build()
                )
+
         params = {self.primary_key: uid}
 
         return self.database.delete(sql=sql, params=params)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import partial
 
+from cator.base.dbapi import ParamStyleEnum
 from .sql_util import SqlUtil
 
 
@@ -21,14 +22,14 @@ class SqlBuilder(object):
         self._sql.extend(args)
         return self
 
-    def set(self, columns, *args):
-        sql = SqlUtil.columns_operation_sql(columns=columns, operator='=')
+    def set(self, columns, *args, paramstyle=ParamStyleEnum.pyformat):
+        sql = SqlUtil.columns_operation_sql(columns=columns, operator='=', paramstyle=paramstyle)
         self.append('set', sql, *args)
         return self
 
-    def values(self, columns, *args):
+    def values(self, columns, *args, paramstyle=ParamStyleEnum.pyformat):
         pre_sql = SqlUtil.parentheses(SqlUtil.columns_sql(columns))
-        after_sql = SqlUtil.parentheses(SqlUtil.placeholders_sql(columns))
+        after_sql = SqlUtil.parentheses(SqlUtil.placeholders_sql(columns=columns, paramstyle=paramstyle))
         self._sql.append(pre_sql)
         self.append('values', after_sql, *args)
         return self

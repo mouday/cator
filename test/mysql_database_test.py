@@ -12,7 +12,6 @@ class MySqlDatabaseTest(unittest.TestCase):
         # show PROCESSLIST;
         db_url = 'mysql://root:123456@localhost:3306/data?autocommit=true'
         self.db = cator.connect(db_url)
-        print(self.db.tables)
         self.table = self.db.table('person')
 
     def tearDown(self) -> None:
@@ -30,8 +29,6 @@ class MySqlDatabaseTest(unittest.TestCase):
 
     def test_table(self):
         table = self.db.table('person')
-
-        print('columns', self.table.columns)
 
         print('total', table.total)
 

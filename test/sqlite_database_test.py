@@ -13,7 +13,6 @@ class SQLiteDatabaseTest(unittest.TestCase):
         # autocommit 模式: isolation_level=null
         db_url = 'sqlite:///data.db'
         self.db = cator.connect(db_url)
-        print(self.db.tables)
         self.table = self.db.table('person')
 
     def tearDown(self) -> None:
@@ -31,8 +30,6 @@ class SQLiteDatabaseTest(unittest.TestCase):
 
     def test_table(self):
         table = self.db.table('person')
-
-        print('columns', self.table.columns)
 
         print('total', table.total)
 

@@ -3,9 +3,7 @@ import logging
 import unittest
 
 from playhouse.db_url import connect
-from cator.peewee import register_dict_database
-
-register_dict_database()
+from cator import DatabaseProxy
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -13,8 +11,10 @@ logging.basicConfig(level=logging.DEBUG)
 class PeeweeDictDatabaseTest(unittest.TestCase):
     def setUp(self) -> None:
         # show PROCESSLIST;
-        db_url = 'mysql+dict://root:123456@localhost:3306/data'
-        self.db = connect(db_url)
+        db_url = 'mysql://root:123456@localhost:3306/data'
+        db = connect(db_url)
+
+        self.db = DatabaseProxy(db)
         self.table = self.db.table('person')
 
     def tearDown(self) -> None:
@@ -34,14 +34,11 @@ class PeeweeDictDatabaseTest(unittest.TestCase):
         row = self.db.select_one('select * from person limit 1')
         print(row)
 
-        print(self.db.table('person').columns)
         print(self.db.table('person').total)
         print(self.db.table('person').select_by_id(11))
 
     def test_table(self):
         table = self.db.table('person')
-
-        print('columns', table.columns)
 
         print('total', table.total)
 

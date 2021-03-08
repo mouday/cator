@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-from .database import Database
+from .database import DatabaseProxy
 from .table import Table

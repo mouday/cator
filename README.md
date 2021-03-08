@@ -9,19 +9,19 @@
 - Pypi: [https://pypi.org/project/cator](https://pypi.org/project/cator)
 
 ## 简介
-支持 mysql和sqlite数据库
+支持 mysql和sqlite数据库, 在现有连接对象Connection 基础上进行增强
 
 返回数据统一为dict 字典
 
 无论使用什么数据库驱动都支持4种占位符：
 
-| paramstyle | support | Meaning | example|
+| paramstyle | support | Meaning | example |
 | - | - | - | - |
-| qmark | OK | Question mark style | ...WHERE name=? |
-| numeric   | - | Numeric, positional style | ...WHERE name=:1 |
-| named | OK | Named style | ...WHERE name=:name |
-| format    | OK | ANSI C printf format codes | ...WHERE name=%s |
-| pyformat | OK | Python extended format codes | ...WHERE name=%(name)s |
+| qmark | OK | Question mark style | `...WHERE name=?` |
+| numeric | - | Numeric, positional style | `...WHERE name=:1` |
+| named | OK | Named style | `...WHERE name=:name` |
+| format | OK | ANSI C printf format codes | `...WHERE name=%s` |
+| pyformat | OK | Python extended format codes | `...WHERE name=%(name)s` |
 
 
 ## 安装
@@ -54,11 +54,7 @@ db.close()
 Database类
 
 ```python
-class Database:
-    @property
-    def tables(self):
-        pass
-
+class DatabaseProxy:
     def table(self, table_name):
         pass
     
@@ -90,13 +86,13 @@ class Database:
         pass
     
     def cursor(self, *args, **kwargs):
-        """返回cursor 对象"""
+        """return cursor object"""
 
     def connect(self):
-        """连接数据库"""
+        """connect database"""
 
     def close(self):
-        """关闭连接"""
+        """close connection"""
         
     def commit(self):
         pass
@@ -111,10 +107,6 @@ Table 类
 ```python
 class Table:
 
-    @property
-    def columns(self):
-        pass
-        
     @property
     def total(self):
         pass
@@ -138,12 +130,13 @@ class Table:
 
 ## 扩展 peewee
 
-通过`DictMySQLDatabase`类，使得peewee原生sql查询进行增强
+通过`DatabaseProxy`类，使得peewee原生sql查询进行增强
 
 ```python
 
 from peewee import MySQLDatabase
-from cator.peewee import DictMySQLDatabase
+from cator import DatabaseProxy
+
 
 config = {
     'host': 'localhost',
@@ -154,43 +147,32 @@ config = {
     'charset': 'utf8mb4',
 }
 
-# replace MySQLDatabase to DictMySQLDatabase
-# db = MySQLDatabase(**config)
-db = DictMySQLDatabase(**config)
+db = MySQLDatabase(**config)
+
+# use cator database proxy
+db_proxy = DatabaseProxy(db)
 
 ```
 
-增强的方法
+`DatabaseProxy`类接收一个`Connection`对象，只需要实现以下4个方法即可
 
 ```python
-from peewee import MySQLDatabase
-
-
-class DictMySQLDatabase(MySQLDatabase):
-    def table(self, table_name):
-        pass
-    
-    def select(self, operation, params=()):
+class Connection(ABC):
+    def close(self):
         pass
 
-    def select_one(self, operation, params=()):
+    def commit(self):
         pass
 
-    def update(self, operation, params=()):
+    def rollback(self):
         pass
 
-    def delete(self, operation, params=()):
+    def cursor(self):
         pass
 
-    def insert(self, operation, params: Union[list, dict]):
-        pass
-
-    def insert_one(self, operation, params: Union[tuple, dict] = ()):
-        pass
-
-    def query(self, sql, params=None):
-        pass
 ```
+
+
 
 ## 注意问题
 

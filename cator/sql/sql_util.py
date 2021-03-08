@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
-import re
+from cator.base.dbapi import ParamStyleEnum
 
 
 class SqlUtil(object):
     """
+    sql builder util
     """
     column_format = '`{}`'
 
-    placeholder_format = '%({})s'
+    # don't support 'numeric'
+    paramstyle_map = {
+        'qmark': '?',
+        'named': ':{}',
+        'format': '%s',
+        'pyformat': '%({})s'
+    }
 
     @classmethod
     def backquote(cls, *args):
@@ -34,22 +41,28 @@ class SqlUtil(object):
         return ", ".join([cls.column_sql(column) for column in columns])
 
     @classmethod
-    def placeholder_sql(cls, column):
+    def placeholder_sql(cls, column, paramstyle=ParamStyleEnum.pyformat):
         """
         获取 占位符 的sql
         """
-        return cls.placeholder_format.format(column)
+        if isinstance(paramstyle, ParamStyleEnum):
+            paramstyle = paramstyle.value
+
+        return cls.paramstyle_map[paramstyle].format(column)
 
     @classmethod
-    def placeholders_sql(cls, columns):
+    def placeholders_sql(cls, columns, paramstyle=ParamStyleEnum.pyformat):
         """
         获取 占位符 的字符串拼接
         '%(name)s, %(age)s'
         """
-        return ", ".join([cls.placeholder_sql(column) for column in columns])
+        return ", ".join([
+            cls.placeholder_sql(column=column, paramstyle=paramstyle)
+            for column in columns
+        ])
 
     @classmethod
-    def column_operation_sql(cls, column, operator='='):
+    def column_operation_sql(cls, column, operator='=', paramstyle=ParamStyleEnum.pyformat):
         """
         获取 列名-占位符 的字符串拼接
         """
@@ -57,15 +70,18 @@ class SqlUtil(object):
             [
                 cls.column_sql(column),
                 operator,
-                cls.placeholder_sql(column)
+                cls.placeholder_sql(column=column, paramstyle=paramstyle)
             ])
 
     @classmethod
-    def columns_operation_sql(cls, columns, operator='='):
+    def columns_operation_sql(cls, columns, operator='=', paramstyle=ParamStyleEnum.pyformat):
         """
         获取 列名-占位符 的字符串拼接
         """
-        return ", ".join([cls.column_operation_sql(column, operator) for column in columns])
+        return ", ".join([
+            cls.column_operation_sql(column=column, operator=operator, paramstyle=paramstyle)
+            for column in columns
+        ])
 
     @classmethod
     def get_list_columns(cls, lst):
@@ -78,59 +94,3 @@ class SqlUtil(object):
             columns.update(row.keys())
 
         return list(columns)
-
-    @classmethod
-    def column_in(cls, column, list_params):
-        data = {}
-        for index, value in enumerate(list_params):
-            data[f'{column}-{index}'] = value
-
-        return cls.parentheses(cls.placeholders_sql(data.keys())), data
-
-    @classmethod
-    def compile_mysql_sql(cls, sql):
-        """转换sql中变量占位符 :key -> %(key)s"""
-        return re.sub(r":(?P<key>\w+)", r"%(\g<key>)s", sql)
-
-    @classmethod
-    def replace_mysql_sql(cls, sql):
-        """占位符替换 ? -> %s """
-        return sql.replace("?", "%s")
-
-    @classmethod
-    def prepare_mysql_sql(cls, sql):
-        """
-        占位符再进行预处理, 支持4种占位符：
-            :key -> %(key)s
-            ? -> %s
-        :param sql: sql
-        :return:
-        """
-        sql = cls.compile_mysql_sql(sql=sql)
-        sql = cls.replace_mysql_sql(sql=sql)
-
-        return sql
-
-    @classmethod
-    def compile_sqlite_sql(cls, sql):
-        """转换sql中变量占位符 %(key)s -> :key"""
-        return re.sub(r"%\((?P<key>\w+)\)s", r":\g<key>", sql)
-
-    @classmethod
-    def replace_sqlite_sql(cls, sql):
-        """占位符替换 ? -> %s """
-        return sql.replace("%s", "?")
-
-    @classmethod
-    def prepare_sqlite_sql(cls, sql):
-        """
-        占位符再进行预处理, 支持4种占位符：
-            %(key)s  ->  :key
-            %s -> ?
-        :param sql: sql
-        :return:
-        """
-        sql = cls.compile_sqlite_sql(sql=sql)
-        sql = cls.replace_sqlite_sql(sql=sql)
-
-        return sql
