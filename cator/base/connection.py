@@ -5,7 +5,7 @@ from cator.logger import logger
 
 
 class ConnectionProxy(Connection):
-    def __init__(self, connection: Connection = None, **kwargs):
+    def __init__(self, connection=None, **kwargs):
         self._connection = connection
         self.config = kwargs
 

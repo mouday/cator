@@ -44,6 +44,7 @@ class PeeweeDictDatabaseTest(unittest.TestCase):
 
     def test_table_insert_one(self):
         ret = self.table.insert_one({'name': 'Tom', 'age': 23})
+        self.db.commit()  # !需要手动提交
         print('ret', ret)
         # time.sleep(20)
 
@@ -59,10 +60,16 @@ class PeeweeDictDatabaseTest(unittest.TestCase):
         ])
         print('ret', ret)
 
+        self.db.commit()  # !需要手动提交
+
     def test_table_delete(self):
-        ret = self.table.delete_by_id(uid=6)
+        ret = self.table.delete_by_id(uid=110)
         print(ret)
 
+        self.db.commit()  # !需要手动提交
+
     def test_table_update(self):
-        ret = self.table.update_by_id(uid=1, data={'name': 'Jackk'})
+        ret = self.table.update_by_id(uid=109, data={'name': 'Jackk'})
         print(ret)
+
+        self.db.commit()  # !需要手动提交

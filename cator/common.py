@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import time
+from functools import wraps
+
+from cator.logger import logger
 
 
 def dict_factory(cursor, row):
@@ -18,3 +22,16 @@ def dict_factory(cursor, row):
 def connect(*args, **kwargs):
     """default connect method"""
     raise Exception('database connect driver not install')
+
+
+# 计时器
+def timer(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time() * 1000
+        ret = func(*args, **kwargs)
+        end_time = time.time() * 1000
+        logger.debug("time: %.2f ms" % (end_time - start_time))
+        return ret
+
+    return wrapper

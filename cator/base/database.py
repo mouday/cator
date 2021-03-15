@@ -3,14 +3,14 @@ from typing import List, Union, Dict
 
 from cator.base.connection import ConnectionProxy
 from cator.base.dbapi import ParamStyleConvert, Connection
-from cator.common import dict_factory
+from cator.common import dict_factory, timer
 from cator.logger import logger
 from .table import Table
 
 
 class DatabaseProxy(ConnectionProxy):
 
-    def __init__(self, connection: Connection = None, paramstyle='pyformat', **kwargs):
+    def __init__(self, connection=None, paramstyle='pyformat', **kwargs):
         super().__init__(connection, **kwargs)
         self.paramstyle = paramstyle
 
@@ -35,6 +35,7 @@ class DatabaseProxy(ConnectionProxy):
         """after execute do something"""
         return cursor
 
+    @timer
     def execute(self, sql: str, params=None):
         """
         execute sql with params
