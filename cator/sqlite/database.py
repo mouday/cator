@@ -24,7 +24,7 @@ class SqliteDatabaseProxy(DatabaseProxy):
     doc: https://docs.python.org/zh-cn/3.7/library/sqlite3.html
     """
 
-    def __init__(self, connection: Connection = None, paramstyle='qmark', **kwargs):
+    def __init__(self, connection=None, paramstyle='qmark', **kwargs):
         super().__init__(connection, paramstyle, **kwargs)
 
     def connect(self):
