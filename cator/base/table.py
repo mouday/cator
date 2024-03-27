@@ -114,8 +114,8 @@ class Table(object):
 
         return self.database.select_one(sql=sql, params=params)
 
-    def where(self, sql):
-        return Query(self.database, self).where(sql)
+    def where(self, sql, *args):
+        return Query(self.database, self).where(sql, *args)
 
     @property
     def primary_key_equal_sql(self):

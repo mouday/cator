@@ -84,16 +84,16 @@ class MySqlDatabaseTest(unittest.TestCase):
 
     def test_table_select_like(self):
         ret = (self.table
-               .where("id like '%tom%'")
+               .where("id like ? and id  = ?", '%tom%', 2)
                .order_by("id desc")
-               .select('`id`'))
+               .select(['id']))
         # SELECT `id` FROM `person` WHERE id like '%tom%' ORDER BY id desc
         print(ret)
 
     def test_table_update(self):
         ret = (self.table
-               .where("id = 1")
-               .update({'age': 24})
+               .where("id = ?", 1)
+               .update({'id': 24})
                )
         # UPDATE `person` SET `age` = %(age)s WHERE id = 1
 
@@ -110,7 +110,7 @@ class MySqlDatabaseTest(unittest.TestCase):
 
     def test_table_count(self):
         ret = (self.table
-               .where("id = 1")
+               .where("id = ?", 1)
                .count()
                )
         # SELECT count(*) as total FROM `person` WHERE id = 1
@@ -119,7 +119,7 @@ class MySqlDatabaseTest(unittest.TestCase):
 
     def test_table_first(self):
         ret = (self.table
-               .where("id = 2")
+               .where("id = ?", 2)
                .first()
                )
         # SELECT * FROM `person` WHERE id = 2 LIMIT 1

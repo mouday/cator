@@ -5,7 +5,10 @@
 """
 from __future__ import annotations
 
-from ..sql import SqlBuilder
+from collections import OrderedDict
+
+from .dbapi import ParamStyleEnum
+from ..sql import SqlBuilder, SqlUtil
 
 from typing import TYPE_CHECKING
 
@@ -19,48 +22,60 @@ class Query(object):
         self.database = database
         self.table = table
         self.sql_build = SqlBuilder()
+        self.params = []
 
     def from_(self, table: Table):
         self.table = table
         return self
 
-    def where(self, sql: str):
+    def where(self, sql: str, *args):
         self.sql_build.where(sql)
+        self.params.extend(args)
         return self
 
-    def order_by(self, sql: str):
+    def order_by(self, sql: str, *args):
         self.sql_build.order_by(sql)
+        self.params.extend(args)
         return self
 
-    def limit(self, sql: str):
-        self.sql_build.limit(sql)
+    def limit(self, arg):
+        self.sql_build.limit('?')
+        self.params.append(arg)
         return self
 
-    def offset(self, sql: str):
-        self.sql_build.offset(sql)
+    def offset(self, arg: str):
+        self.sql_build.offset('?')
+        self.params.append(arg)
         return self
 
-    def group_by(self, sql: str):
+    def group_by(self, sql: str, *args):
         self.sql_build.group_by(sql)
+        self.params.extend(args)
         return self
 
-    def having(self, sql: str):
+    def having(self, sql: str, *args):
         self.sql_build.having(sql)
+        self.params.extend(args)
         return self
 
-    def join(self, sql: str):
+    def join(self, sql: str, *args):
         self.sql_build.join(sql)
+        self.params.extend(args)
         return self
 
     def update(self, data: dict):
+        values = OrderedDict(sorted(data.items()))
+
         sql = (SqlBuilder()
                .update(self.table.backquote_table_name)
-               .set(data.keys())
+               .set(values.keys(), paramstyle=ParamStyleEnum.qmark)
                .extend(self.sql_build.build())
                .build()
                )
 
-        return self.database.update(sql, data)
+        bindings = tuple(list(values.values()) + self.params)
+
+        return self.database.update(sql=sql, params=bindings)
 
     def delete(self):
         sql = (SqlBuilder()
@@ -68,9 +83,12 @@ class Query(object):
                .extend(self.sql_build.build())
                .build())
 
-        return self.database.delete(sql)
+        return self.database.delete(sql=sql, params=tuple(self.params))
 
     def select(self, columns='*'):
+        if isinstance(columns, list):
+            columns = SqlUtil.columns_sql(columns)
+
         sql = (SqlBuilder()
                .select(columns)
                .from_(self.table.backquote_table_name)
@@ -78,9 +96,12 @@ class Query(object):
                .build()
                )
 
-        return self.database.select(sql)
+        return self.database.select(sql=sql, params=tuple(self.params))
 
     def first(self, columns='*'):
+        if isinstance(columns, list):
+            columns = SqlUtil.columns_sql(columns)
+
         self.sql_build.limit(1)
 
         sql = (SqlBuilder()
@@ -90,15 +111,15 @@ class Query(object):
                .build()
                )
 
-        return self.database.select_one(sql)
+        return self.database.select_one(sql=sql, params=tuple(self.params))
 
-    def count(self):
+    def count(self, alias='total'):
         sql = (SqlBuilder()
-               .select('count(*) as total')
+               .select('count(*) as ' + alias)
                .from_(self.table.backquote_table_name)
                .extend(self.sql_build.build())
                .build()
                )
 
-        row = self.database.select_one(sql=sql)
-        return row['total']
+        row = self.database.select_one(sql=sql, params=tuple(self.params))
+        return row[alias]
