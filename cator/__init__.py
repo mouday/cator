@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from .base import DatabaseProxy
 from .db_url import parse_url_to_dict
-from .mysql import MysqlDatabaseProxy
-from .sqlite import SqliteDatabaseProxy
+from .base.database import DatabaseProxy
+from .mysql.database import MysqlDatabaseProxy, MysqlReconnectDatabaseProxy
+from .sqlite.database import SqliteDatabaseProxy
 
 schemes = {
     'mysql': MysqlDatabaseProxy,
+    'mysql+reconnect': MysqlReconnectDatabaseProxy,
     'sqlite': SqliteDatabaseProxy,
 }
 

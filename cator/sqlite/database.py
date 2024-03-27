@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 
-from cator.base import DatabaseProxy
-from cator.base.dbapi import Connection
-from cator.logger import logger
-
 try:
     from sqlite3 import connect
 except ImportError:
     from cator.common import connect
+
+from cator.base.database import DatabaseProxy
+from cator.logger import logger
 
 
 # doc： https://www.sqlite.org/lang_transaction.html#immediate
@@ -28,5 +27,5 @@ class SqliteDatabaseProxy(DatabaseProxy):
         super().__init__(connection, paramstyle, **kwargs)
 
     def connect(self):
-        self._connection = connect(**self.config)
         logger.debug("Database open")
+        return connect(**self.config)

@@ -28,7 +28,8 @@ class DatabaseProxy(ConnectionProxy):
     def before_execute(self, sql: str, params=None):
         """before execute do something"""
         sql = ParamStyleConvert.convert(paramstyle=self.paramstyle, sql=sql)
-        logger.debug('%s %s', sql, params)
+        logger.debug('sql: %s', sql)
+        logger.debug('params: %s', params)
         return sql
 
     def after_execute(self, cursor):

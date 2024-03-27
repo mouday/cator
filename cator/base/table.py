@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .database import DatabaseProxy
 
 from typing import Union, Dict
 
+from cator.base.query import Query
 from cator.sql import SqlBuilder, SqlUtil
 
 
 class Table(object):
 
-    def __init__(self, database, table_name: str, primary_key: str = 'id'):
+    def __init__(self, database: DatabaseProxy, table_name: str, primary_key: str = 'id'):
         self.database = database
         self.table_name = table_name
         self.primary_key = primary_key
@@ -107,6 +113,9 @@ class Table(object):
         params = {self.primary_key: uid}
 
         return self.database.select_one(sql=sql, params=params)
+
+    def where(self, sql):
+        return Query(self.database, self).where(sql)
 
     @property
     def primary_key_equal_sql(self):

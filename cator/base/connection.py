@@ -15,12 +15,22 @@ class ConnectionProxy(Connection):
     @property
     def connection(self):
         if self._connection is None:
-            self.connect()
+            self._connection = self.connect()
 
         return self._connection
 
+    def is_connected(self):
+        """
+        @since v1.0.0
+        :return:
+        """
+        return self._connection is not None
+
     def connect(self):
-        """连接数据库"""
+        # type: () -> Connection
+        """
+        连接数据库
+        """
         raise NotImplementedError()
 
     ############################################

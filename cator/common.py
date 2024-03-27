@@ -35,3 +35,7 @@ def timer(func):
         return ret
 
     return wrapper
+
+
+class OperationalError(Exception):
+    pass

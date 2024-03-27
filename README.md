@@ -9,9 +9,12 @@
 - Pypi: [https://pypi.org/project/cator](https://pypi.org/project/cator)
 
 ## 简介
+
 支持 mysql和sqlite数据库, 在现有连接对象Connection 基础上进行增强
 
 返回数据统一为dict 字典
+
+> 不推荐在生产环境下使用
 
 
 ## 安装
@@ -213,7 +216,7 @@ class Table:
 
 cator基于以下模块进行了改进
 
-1. myquery
-2. aquery
-3. puremysql
-4. pythink
+1. myquery：https://github.com/mouday/myquery
+2. aquery：https://github.com/mouday/aquery
+3. puremysql https://github.com/mouday/puremysql
+4. pythink https://github.com/mouday/pythink

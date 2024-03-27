@@ -22,6 +22,10 @@ class SqlBuilder(object):
         self._sql.extend(args)
         return self
 
+    def extend(self, *args):
+        self._sql.extend(args)
+        return self
+
     def set(self, columns, *args, paramstyle=ParamStyleEnum.pyformat):
         sql = SqlUtil.columns_operation_sql(columns=columns, operator='=', paramstyle=paramstyle)
         self.append('set', sql, *args)
@@ -35,7 +39,7 @@ class SqlBuilder(object):
         return self
 
     def build(self):
-        return " ".join(self._sql)
+        return " ".join([str(sql) for sql in self._sql])
 
     @classmethod
     def upper_keywords(cls, keywords):
