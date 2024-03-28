@@ -148,3 +148,33 @@ class Query(object):
         rows = self.select(column)
 
         return Collection(rows).first()[column]
+
+    def increment(self, column, amount=1):
+        """
+
+        :param column:
+        :param amount:
+        :return: row_count
+        """
+        sql = (SqlBuilder()
+               .update(self._table)
+               .append('set', f'`{column}` = `{column}` + ?')
+               .extend(self.sql_build.build())
+               .build()
+               )
+
+        bindings = tuple([amount] + self.params)
+
+        return self.database.update(sql=sql, params=bindings)
+
+    def decrement(self, column, amount=1):
+        sql = (SqlBuilder()
+               .update(self._table)
+               .append('set', f'`{column}` = `{column}` - ?')
+               .extend(self.sql_build.build())
+               .build()
+               )
+
+        bindings = tuple([amount] + self.params)
+
+        return self.database.update(sql=sql, params=bindings)

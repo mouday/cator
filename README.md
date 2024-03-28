@@ -13,7 +13,7 @@
 
 支持 mysql和sqlite数据库, 在现有连接对象Connection 基础上进行增强
 
-返回数据统一为dict 字典
+返回数据统一为dict 字典，提高脚本书写速度
 
 ## 安装
 
@@ -29,6 +29,8 @@ pip install cator
 ## 使用示例
 
 ### 1、获取新的连接Database 对象 
+
+Database 可以适用各种场景
 
 ```python
 import cator
@@ -128,6 +130,8 @@ print(row_count) # 1
 Table 类提供了一系列的简化操作
 
 > 注意：使用table操作，仅支持`?`或者`%s`作为占位符
+
+Table 仅适用于单表操作，多表操作可以使用 Database对象
 
 ```python
 # 获取 Table 对象
@@ -236,6 +240,17 @@ rows = query.select_page(2, 1)
 print(rows)
 # [{'id': 3, 'name': 'Tom', 'age': 23}]
 
+
+# increment
+row_count = table.where("id = ?", 4).increment('age', 1)
+# UPDATE `person` SET `age` = `age` + %s WHERE id = %s
+print(row_count)
+
+
+# decrement
+row_count = table.where("id = ?", 4).decrement('age', 1)
+# UPDATE `person` SET `age` = `age` - %s WHERE id = %s
+print(row_count)
 ```
  
 ## 2、扩展现有连接
@@ -319,86 +334,6 @@ proxy_db.close()
 | format | OK | ANSI C printf format codes | `...WHERE name=%s` |
 | pyformat | OK | Python extended format codes | `...WHERE name=%(name)s` |
 
-
-## 接口
-
-Database类
-
-```python
-class DatabaseProxy:
-    def table(self, table_name):
-        pass
-    
-    def select(self, operation, params=()):
-        pass
-
-    def select_one(self, operation, params=()):
-        pass
-
-    def update(self, operation, params=()):
-        pass
-
-    def delete(self, operation, params=()):
-        pass
-
-    def insert(self, operation, params: Union[list, dict]):
-        pass
-
-    def insert_one(self, operation, params: Union[tuple, dict] = ()):
-        pass
-
-    def before_execute(self, operation, params=None):
-        pass
-
-    def after_execute(self, cursor):
-        pass
-
-    def execute(self, operation, params=None):
-        pass
-    
-    def cursor(self, *args, **kwargs):
-        """return cursor object"""
-
-    def connect(self):
-        """connect database"""
-
-    def close(self):
-        """close connection"""
-        
-    def commit(self):
-        pass
-
-    def rollback(self):
-        pass
-
-```
-
-Table 类
-
-```python
-class Table:
-
-    def count(self):
-        pass
-
-    def insert(self, data: Union[dict, list]):
-        pass
-        
-    def insert_one(self, data: dict):
-        pass
-        
-    def delete_by_id(self, uid):
-        pass
-        
-    def update_by_id(self, uid, data):
-        pass
-        
-    def select_by_id(self, uid):
-        pass
-    
-    def where(self, sql, *args):
-        pass
-```
 
 ## 显示sql日志
 

@@ -180,3 +180,13 @@ class MySqlDatabaseTest(unittest.TestCase):
         # SELECT * FROM `person` WHERE age > %s LIMIT %s OFFSET %s
         print(rows)
         # [{'id': 3, 'name': 'Tom', 'age': 23}]
+
+    def test_increment(self):
+        row_count = self.table.where("id = ?", 4).increment('age', 1)
+        # UPDATE `person` SET `age` = `age` + %s WHERE id = %s
+        print(row_count)
+
+    def test_decrement(self):
+        row_count = self.table.where("id = ?", 4).decrement('age', 1)
+        # UPDATE `person` SET `age` = `age` - %s WHERE id = %s
+        print(row_count)
