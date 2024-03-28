@@ -141,7 +141,7 @@ class Query(object):
         :return:
         """
         if column:
-            column = f'count(`{column}`)'
+            column = 'count(`{column}`)'.format(column=column)
         else:
             column = 'count(*)'
 
@@ -158,7 +158,7 @@ class Query(object):
         """
         sql = (SqlBuilder()
                .update(self._table)
-               .append('set', f'`{column}` = `{column}` + ?')
+               .append('set', '`{column}` = `{column}` + ?'.format(column=column))
                .extend(self.sql_build.build())
                .build()
                )
@@ -170,7 +170,7 @@ class Query(object):
     def decrement(self, column, amount=1):
         sql = (SqlBuilder()
                .update(self._table)
-               .append('set', f'`{column}` = `{column}` - ?')
+               .append('set', '`{column}` = `{column}` - ?'.format(column=column))
                .extend(self.sql_build.build())
                .build()
                )

@@ -61,7 +61,7 @@ class Table(object):
         :return: affect row count
         """
         return (self.new_query()
-                .where(f"`{self.primary_key}` = ?", uid)
+                .where("`{primary_key}` = ?".format(primary_key=self.primary_key), uid)
                 .delete())
 
     def update_by_id(self, uid, data) -> int:
@@ -71,7 +71,7 @@ class Table(object):
         :return: affect row count
         """
         return (self.new_query()
-                .where(f"`{self.primary_key}` = ?", uid)
+                .where("`{primary_key}` = ?".format(primary_key=self.primary_key), uid)
                 .update(data))
 
     def select_by_id(self, uid, columns=None) -> Dict:
@@ -82,7 +82,7 @@ class Table(object):
         """
 
         return (self.new_query()
-                .where(f"`{self.primary_key}` = ?", uid)
+                .where("`{primary_key}` = ?".format(primary_key=self.primary_key), uid)
                 .select_one(columns)
                 )
 
