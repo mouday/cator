@@ -39,7 +39,7 @@ install-require:
 fix:
 	git add . && git commit -m 'fix' && git push
 
-# 测试
+# 运行测试
 # make test
 .PHONY: test
 test:
