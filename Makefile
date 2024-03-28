@@ -3,6 +3,12 @@
 release:
 	python ./version-cli/auto_release.py
 
+# 发布 make upload
+.PHONY: upload
+upload:
+	twine check dist/*
+	twine upload --repository cator --verbose dist/*
+
 # 打包
 # make build
 .PHONY: build
@@ -14,12 +20,8 @@ clean:
 	rm -rf temp logs .pytest_cache
 	rm -rf dist build *.egg-info
 
-# 上传打包产物到 pypi
-upload:
-	twine check dist/*
-	twine upload dist/*
-
 # 发布 make publish
+.PHONY: publish
 publish:
 	make clean
 	make build
