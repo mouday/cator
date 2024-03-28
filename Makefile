@@ -42,3 +42,9 @@ install-require:
 .PHONY: fix
 fix:
 	git add . && git commit -m 'fix' && git push
+
+# 测试
+# make test
+.PHONY: test
+test:
+	python -m unittest tests/sqlite_database_test.py

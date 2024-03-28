@@ -12,7 +12,8 @@ from cator.sql import SqlBuilder, SqlUtil
 
 class Table(object):
 
-    def __init__(self, database: Union["DatabaseProxy", None], table_name: str, primary_key: str = 'id'):
+    def __init__(self, database, table_name, primary_key='id'):
+        # type: (Union[DatabaseProxy, None], str, str)-> None
         self.database = database
         self.table_name = table_name
         self._table_name = SqlUtil.backquote(self.table_name)
