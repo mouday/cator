@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+sqlite_database_test.py
+"""
 
 import logging
 import unittest
@@ -11,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG)
 class SQLiteDatabaseTest(unittest.TestCase):
     def setUp(self) -> None:
         # autocommit 模式: isolation_level=null
-        db_url = 'sqlite:///data.db'
+        db_url = 'sqlite:///data.db?isolation_level=null'
         self.db = cator.connect(db_url)
         self.table = self.db.table('person')
 
@@ -31,7 +34,7 @@ class SQLiteDatabaseTest(unittest.TestCase):
     def test_table(self):
         table = self.db.table('person')
 
-        print('total', table.total)
+        print('total', table.select_count())
 
     def test_transaction(self):
         self.db.table('person').insert_one({'name': 'transaction-rollback'})
@@ -40,7 +43,8 @@ class SQLiteDatabaseTest(unittest.TestCase):
         self.db.commit()
 
     def test_table_insert_one(self):
-        ret = self.table.insert_one({'name': 'Tom', 'age': 23})
+        data = {'name': 'Tom', 'age': 23}
+        ret = self.table.insert_one(data)
         print('ret', ret)
 
     def test_table_insert(self):
