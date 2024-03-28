@@ -45,7 +45,7 @@ jobs:
 
       - name: Build
         run: |
-            python setup.py sdist bdist_wheel --python-tag py2.py3
+            python setup.py sdist bdist_wheel --python-tag py3
             twine check dist/*
 
       # Publishing with a Trusted Publisher
