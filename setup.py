@@ -57,7 +57,7 @@ with io.open("README.md", 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 # 依赖
-with io.open("requirements.txt", 'r') as f:
+with io.open("requirements/production.txt", 'r') as f:
     install_requires = f.read().split(os.linesep)
 
 setup(

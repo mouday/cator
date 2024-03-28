@@ -4,6 +4,8 @@ release:
 	python ./version-cli/auto_release.py
 
 # 打包
+# make build
+.PHONY: build
 build:
 	python setup.py sdist bdist_wheel --python-tag py3
 
