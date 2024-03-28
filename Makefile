@@ -26,10 +26,6 @@ publish:
 	make upload
 	make clean
 
-# 运行所有测试
-.PHONY: test
-test:
-	pytest -c pytest.ini tests/api/test_index.py
 
 # 安装开发环境依赖
 # make install-require
