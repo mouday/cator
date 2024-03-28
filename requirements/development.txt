@@ -1,4 +1,2 @@
 pymysql
-mysql-connector-python
-mysqlclient
 six
