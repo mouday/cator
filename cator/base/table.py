@@ -13,22 +13,11 @@ from cator.sql import SqlBuilder, SqlUtil
 
 class Table(object):
 
-    def __init__(self, database: DatabaseProxy, table_name: str, primary_key: str = 'id'):
+    def __init__(self, database: Union[DatabaseProxy, None], table_name: str, primary_key: str = 'id'):
         self.database = database
         self.table_name = table_name
+        self._table_name = SqlUtil.backquote(self.table_name)
         self.primary_key = primary_key
-
-    @property
-    def total(self) -> int:
-        """return table row total count"""
-        sql = (SqlBuilder()
-               .select('count(*) as total')
-               .from_(self.backquote_table_name)
-               .build()
-               )
-
-        row = self.database.select_one(sql=sql)
-        return row['total']
 
     def insert(self, data: Union[dict, list]) -> int:
         """
@@ -46,7 +35,7 @@ class Table(object):
             raise Exception('data type must dict or list[dict]')
 
         sql = (SqlBuilder()
-               .insert_into(self.backquote_table_name)
+               .insert_into(self._table_name)
                .values(columns)
                .build()
                )
@@ -59,7 +48,7 @@ class Table(object):
         :return: inserted row id
         """
         sql = (SqlBuilder()
-               .insert_into(self.backquote_table_name)
+               .insert_into(self._table_name)
                .values(data.keys())
                .build()
                )
@@ -71,15 +60,9 @@ class Table(object):
         :param uid: primary key value
         :return: affect row count
         """
-        sql = (SqlBuilder()
-               .delete_from(self.backquote_table_name)
-               .where(self.primary_key_equal_sql)
-               .build()
-               )
-
-        params = {self.primary_key: uid}
-
-        return self.database.delete(sql=sql, params=params)
+        return (self.new_query()
+                .where(f"`{self.primary_key}` = ?", uid)
+                .delete())
 
     def update_by_id(self, uid, data) -> int:
         """
@@ -87,40 +70,36 @@ class Table(object):
         :param data: dict
         :return: affect row count
         """
-        sql = (SqlBuilder()
-               .update(self.backquote_table_name)
-               .set(data.keys())
-               .where(self.primary_key_equal_sql)
-               .build()
-               )
+        return (self.new_query()
+                .where(f"`{self.primary_key}` = ?", uid)
+                .update(data))
 
-        params = {**data, self.primary_key: uid}
-
-        return self.database.update(sql=sql, params=params)
-
-    def select_by_id(self, uid) -> Dict:
+    def select_by_id(self, uid, columns=None) -> Dict:
         """
         :param uid: primary key value
+        :param columns:
         :return: row dict
         """
-        sql = (SqlBuilder()
-               .select('*')
-               .from_(self.backquote_table_name)
-               .where(self.primary_key_equal_sql)
-               .build()
-               )
 
-        params = {self.primary_key: uid}
+        return (self.new_query()
+                .where(f"`{self.primary_key}` = ?", uid)
+                .select_one(columns)
+                )
 
-        return self.database.select_one(sql=sql, params=params)
+    def select_one(self, columns=None) -> int:
+        """return table row total count"""
+        return self.new_query().select_one(columns)
+
+    def select_count(self, column=None) -> int:
+        """return table row total count"""
+        return self.new_query().select_count(column)
+
+    def select_page(self, page: int, size: int, columns=None) -> int:
+        """select rows"""
+        return self.new_query().select_page(page, size, columns)
 
     def where(self, sql, *args):
-        return Query(self.database, self).where(sql, *args)
+        return self.new_query().where(sql, *args)
 
-    @property
-    def primary_key_equal_sql(self):
-        return SqlUtil.column_operation_sql(column=self.primary_key, operator='=')
-
-    @property
-    def backquote_table_name(self):
-        return SqlUtil.backquote(self.table_name)
+    def new_query(self):
+        return Query(self.database).from_(self.table_name)

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-
-from cator.base.dbapi import Connection
+from cator.base import dbapi
 from cator.logger import logger
 
 
-class ConnectionProxy(Connection):
+class ConnectionProxy(dbapi.Connection):
     def __init__(self, connection=None, **kwargs):
+        # type: (dbapi.Connection, any) -> None
         self._connection = connection
         self.config = kwargs
 
@@ -27,7 +27,7 @@ class ConnectionProxy(Connection):
         return self._connection is not None
 
     def connect(self):
-        # type: () -> Connection
+        # type: () -> dbapi.Connection
         """
         连接数据库
         """

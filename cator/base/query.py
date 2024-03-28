@@ -7,25 +7,27 @@ from __future__ import annotations
 
 from collections import OrderedDict
 
+from .collection import Collection
 from .dbapi import ParamStyleEnum
 from ..sql import SqlBuilder, SqlUtil
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union, List, Dict
 
 if TYPE_CHECKING:
-    from .table import Table
     from .database import DatabaseProxy
 
 
 class Query(object):
-    def __init__(self, database: DatabaseProxy, table: Table = None):
+    def __init__(self, database: DatabaseProxy):
         self.database = database
-        self.table = table
+        self.table = None
+        self._table = None
         self.sql_build = SqlBuilder()
         self.params = []
 
-    def from_(self, table: Table):
+    def from_(self, table: str):
         self.table = table
+        self._table = SqlUtil.backquote(self.table)
         return self
 
     def where(self, sql: str, *args):
@@ -64,10 +66,18 @@ class Query(object):
         return self
 
     def update(self, data: dict):
+        """
+        update rows and return row count
+        :param data:
+        :return: row_count
+        """
+        if not data:
+            return 0
+
         values = OrderedDict(sorted(data.items()))
 
         sql = (SqlBuilder()
-               .update(self.table.backquote_table_name)
+               .update(self._table)
                .set(values.keys(), paramstyle=ParamStyleEnum.qmark)
                .extend(self.sql_build.build())
                .build()
@@ -77,49 +87,64 @@ class Query(object):
 
         return self.database.update(sql=sql, params=bindings)
 
-    def delete(self):
+    def delete(self) -> int:
+        """
+        execute delete rows and return row count
+        :return: row_count
+        """
         sql = (SqlBuilder()
-               .delete_from(self.table.backquote_table_name)
+               .delete_from(self._table)
                .extend(self.sql_build.build())
                .build())
 
         return self.database.delete(sql=sql, params=tuple(self.params))
 
-    def select(self, columns='*'):
-        if isinstance(columns, list):
+    def select(self, columns: Union[str, List, None] = None) -> List[Dict]:
+        """
+        select rows
+        :param columns:
+        :return:
+        """
+        if columns is None:
+            columns = '*'
+        elif isinstance(columns, list):
             columns = SqlUtil.columns_sql(columns)
 
         sql = (SqlBuilder()
                .select(columns)
-               .from_(self.table.backquote_table_name)
+               .from_(self._table)
                .extend(self.sql_build.build())
                .build()
                )
 
         return self.database.select(sql=sql, params=tuple(self.params))
 
-    def first(self, columns='*'):
-        if isinstance(columns, list):
-            columns = SqlUtil.columns_sql(columns)
+    def select_one(self, columns: Union[str, List, None] = None) \
+            -> Union[Dict, None]:
 
-        self.sql_build.limit(1)
+        if 'LIMIT' not in self.sql_build.build():
+            self.sql_build.limit(1)
 
-        sql = (SqlBuilder()
-               .select(columns)
-               .from_(self.table.backquote_table_name)
-               .extend(self.sql_build.build())
-               .build()
-               )
+        rows = self.select(columns)
 
-        return self.database.select_one(sql=sql, params=tuple(self.params))
+        return Collection(rows).first()
 
-    def count(self, alias='total'):
-        sql = (SqlBuilder()
-               .select('count(*) as ' + alias)
-               .from_(self.table.backquote_table_name)
-               .extend(self.sql_build.build())
-               .build()
-               )
+    def select_page(self, page: int, size: int, columns=None):
+        self.sql_build.limit('?').offset('?')
+        self.params.extend([size, (page - 1) * size])
+        return self.select(columns)
 
-        row = self.database.select_one(sql=sql, params=tuple(self.params))
-        return row[alias]
+    def select_count(self, column: str = None) -> int:
+        """
+        获取统计总数
+        :param column: str 别名
+        :return:
+        """
+        if column:
+            column = f'count(`{column}`)'
+        else:
+            column = 'count(*)'
+
+        rows = self.select(column)
+
+        return Collection(rows).first()[column]

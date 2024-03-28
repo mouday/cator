@@ -5,6 +5,7 @@ from cator.base.connection import ConnectionProxy
 from cator.base.dbapi import ParamStyleConvert, Connection
 from cator.common import dict_factory, timer
 from cator.logger import logger
+from . import dbapi
 from .table import Table
 
 
@@ -17,9 +18,9 @@ class DatabaseProxy(ConnectionProxy):
     ############################################
     # table
     ############################################
-    def table(self, table_name) -> Table:
+    def table(self, table_name: str, primary_key: str = 'id') -> Table:
         """return Table object"""
-        return Table(database=self, table_name=table_name)
+        return Table(database=self, table_name=table_name, primary_key=primary_key)
 
     ############################################
     # execute
@@ -37,7 +38,7 @@ class DatabaseProxy(ConnectionProxy):
         return cursor
 
     @timer
-    def execute(self, sql: str, params=None):
+    def execute(self, sql: str, params=None) -> dbapi.Cursor:
         """
         execute sql with params
         :param sql:
