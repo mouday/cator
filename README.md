@@ -400,6 +400,14 @@ class Table:
         pass
 ```
 
+## 显示sql日志
+
+```python
+import logging
+
+logger = logging.getLogger('cator')
+logger.setLevel(level=logging.DEBUG)
+```
 
 ## 注意问题
 
