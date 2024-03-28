@@ -3,8 +3,6 @@
 @File    : query.py
 @Date    : 2024-03-27
 """
-from __future__ import annotations
-
 from collections import OrderedDict
 
 from .collection import Collection
@@ -18,7 +16,8 @@ if TYPE_CHECKING:
 
 
 class Query(object):
-    def __init__(self, database: DatabaseProxy):
+    def __init__(self, database):
+        # type: (DatabaseProxy)->None
         self.database = database
         self.table = None
         self._table = None
