@@ -1,3 +1,9 @@
+- v1.0.8(2024-03-28)
+    - 增加兼容版本号
+    - fix
+    - 移除 from __future__ import annotations
+    - 兼容py3.5
+
 - v1.0.7(2024-03-28)
     - fix
 
